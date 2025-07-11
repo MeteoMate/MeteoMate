@@ -1,0 +1,36 @@
+.time-slider {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: white;
+    padding: 20px;
+    border: 1px solid;
+
+    &--wrapper {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        right: 50%;
+        display: flex;
+        justify-content: center;
+    }
+
+
+    &__play-button {
+        background-color: black;
+        border: none;
+        color: white;
+        padding: 15px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        margin-right: 10px;
+        min-width: 80px;
+    }
+
+    &__selected-date {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+}
