@@ -1,6 +1,9 @@
 import os
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import load_dotenv, find_dotenv
+
+env = os.getenv("APP_ENV", "development")
+
+load_dotenv(find_dotenv(f".env.{env}"), override=True)
 
 class Config:
     DATABASE_URL = os.getenv("DATABASE_URL")

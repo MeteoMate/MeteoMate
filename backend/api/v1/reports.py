@@ -61,7 +61,6 @@ def get_data():
     place = None
     auspraegung = None
 
-    # map MangoDB query to SQL query
     for element in filter_data:
         if 'properties.qualityCheckPassed' in element.keys(): 
             quality_check_passed = element['properties.qualityCheckPassed']
@@ -89,45 +88,57 @@ def get_data():
             only_with_image = True
     
     
-    # create sql call
     params = {'qualityCheckPassed': quality_check_passed, 'timesReportedForWeather': times_reported_for_weather_lt,
           'timestamp_gt': timestamp_gt, 'timestamp_lt': timestamp_lt,'categories': categories, }
     
-    sql_in = f''' SELECT 
-        meldungId as id,
-        ST_AsGeoJSON(wkb_geometry)::json->'coordinates'-> 0 as coordinates,
-        category,
-        auspraegung,
-        timestamp,
-        CASE 
-            WHEN timesreportedforimage > 0 OR imageurl IS NULL THEN NULL
-            ELSE SPLIT_PART(imageurl, '/', -1)
-        END
-        as "imageName"
-        FROM {Config.REPORTS_TABLE_NAME}
-        WHERE {Config.REPORTS_TABLE_NAME}.qualitycheckpassed = %(qualityCheckPassed)s and
-        timesReportedForWeather < %(timesReportedForWeather)s and
-        timestamp > %(timestamp_gt)s and timestamp < %(timestamp_lt)s and
-        {Config.REPORTS_TABLE_NAME}.category = ANY(%(categories)s)'''
+    if categories:
+        params["categories"] = categories
+    else:
+        params["categories"] = None
 
-    # add possible filter values if necessary
+    clauses = [
+        sql.SQL("reports_table.qualitycheckpassed = %(qualityCheckPassed)s"),
+        sql.SQL("timesReportedForWeather < %(timesReportedForWeather)s"),
+        sql.SQL("timestamp > %(timestamp_gt)s"),
+        sql.SQL("timestamp < %(timestamp_lt)s"),
+    ]
+
+    if params["categories"] is not None:
+        clauses.append(sql.SQL("reports_table.category = ANY(%(categories)s::text[])"))
+
     if place:
-        params['place'] = place
-        sql_in = sql_in + ''' and {Config.REPORTS_TABLE_NAME}.place = ANY(%(place)s)'''
-        
+        params["place"] = place
+        clauses.append(sql.SQL("reports_table.place = ANY(%(place)s)"))
+
     if auspraegung:
-        params['auspraegung'] = auspraegung
-        sql_in = sql_in + ''' and {Config.REPORTS_TABLE_NAME}.auspraegung = ANY(%(auspraegung)s)'''
+        params["auspraegung"] = auspraegung
+        clauses.append(sql.SQL("reports_table.auspraegung = ANY(%(auspraegung)s)"))
 
     if only_without_image:
-        sql_in = sql_in + ''' and ({Config.REPORTS_TABLE_NAME}.imageurl is Null or {Config.REPORTS_TABLE_NAME}.timesreportedforimage > 0)'''
+        clauses.append(sql.SQL("(reports_table.imageurl IS NULL OR reports_table.timesreportedforimage > 0)"))
 
     if only_with_image:
-        sql_in = sql_in + ''' and {Config.REPORTS_TABLE_NAME}.imageurl is not Null and {Config.REPORTS_TABLE_NAME}.timesreportedforimage < 1'''
+        clauses.append(sql.SQL("reports_table.imageurl IS NOT NULL AND reports_table.timesreportedforimage < 1"))
 
-
+    query = sql.SQL("""
+        SELECT 
+            meldungId AS id,
+            (ST_AsGeoJSON(wkb_geometry)::json->'coordinates'->0) AS coordinates,
+            category,
+            auspraegung,
+            timestamp,
+            CASE 
+                WHEN timesreportedforimage > 0 OR imageurl IS NULL THEN NULL
+                ELSE SPLIT_PART(imageurl, '/', -1)
+            END AS "imageName"
+        FROM {t} AS reports_table
+        WHERE {where}
+    """).format(
+        t=sql.Identifier(Config.REPORTS_TABLE_NAME),
+        where=sql.SQL(" AND ").join(clauses),
+    )
     with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
-        cur.execute(sql_in, params)
+        cur.execute(query, params)
         rows = cur.fetchall()
 
     return jsonify(rows)
