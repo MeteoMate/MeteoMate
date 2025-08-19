@@ -8,7 +8,7 @@ export const apiSlice = createApi({
     getTrajectories: builder.query({
       query: (params) => {
         const queryParams = new URLSearchParams(params).toString();
-        return `/trajectories?${queryParams}`;
+        return `/api/v1/trajectories?${queryParams}`;
       },
     }),
     getReports: builder.query({
@@ -32,7 +32,7 @@ export const apiSlice = createApi({
         }
 
 
-        return `/reports?${queryParams}`;
+        return `/api/v1/reports?${queryParams}`;
       },
     }),
     getRadar: builder.query({
@@ -47,7 +47,7 @@ export const apiSlice = createApi({
           queryParams.set('endtime', endtime);
         }
 
-        return `/radar?${queryParams}`;
+        return `/api/v1/radar-czc?${queryParams}`;
       },
     }),
     getBZC: builder.query({
@@ -62,7 +62,7 @@ export const apiSlice = createApi({
           queryParams.set('endtime', endtime);
         }
 
-        return `/radar-bzc?${queryParams}`;
+        return `/api/v1/radar-bzc?${queryParams}`;
       },
     })
   }),

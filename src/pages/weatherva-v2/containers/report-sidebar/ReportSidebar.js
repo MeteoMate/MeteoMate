@@ -35,7 +35,7 @@ export default function ReportSidebar(props) {
             queryParams.set('endtime', endtime);
         }
 
-        const response = await fetch(`${API_URL}/clusterImage?${queryParams}`);
+        const response = await fetch(`${API_URL}/api/v1/clusterImage?${queryParams}`);
         const data = await response.json();
         return data;
     });

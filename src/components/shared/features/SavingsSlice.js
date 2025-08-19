@@ -71,7 +71,7 @@ const applyMapFilters = (data, areas, points, proximityPoints) => {
 }
 
 const getData = async (filter, areaFilter) => {
-    return await fetch(`${API_URL}/getData/`, {
+    return await fetch(`${API_URL}/api/v1/getData`, {
         'method': 'POST',
         headers: {
             'Content-Type': 'application/json'
