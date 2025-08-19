@@ -6,3 +6,5 @@ psycopg[binary]
 h5py
 cftime
 tables
+psycopg[binary,pool]
+flask_compress
