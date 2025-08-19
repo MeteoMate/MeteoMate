@@ -13,21 +13,12 @@ yarn start
 
 `````
 cd backend
-python3 -m venv venv
-. venv/bin/activate
+python -m venv venv
+source venv/bin/activate
 `````
 
 `````
-python3 -m pip install Flask
-python3 -m pip install python-dotenv
-python3 -m pip install -U flask-cors
-python3 -m pip install pandas
-python3 -m pip install psycopg
-pip install "psycopg[binary]"
-pip install pandas
-pip install h5py
-pip install cftime
-pip install tables
+pip install -r requirements.txt
 `````
 
 To start the backend run the following command from the root directory:

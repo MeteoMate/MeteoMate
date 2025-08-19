@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
 from .core.config import Config
-from .core.db import pool
 from .api.v1.radar import bp as radar_bp
 from .api.v1.reports import bp as reports_bp
 from .api.v1.trajectories import bp as traj_bp

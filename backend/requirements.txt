@@ -1,10 +1,7 @@
 Flask
-python-dotenv
 flask-cors
-pandas
-psycopg[binary]
-h5py
-cftime
-tables
+Flask-Compress
+python-dotenv
 psycopg[binary,pool]
-flask_compress
+pandas
+python-dotenv
