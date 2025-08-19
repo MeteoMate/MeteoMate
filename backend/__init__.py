@@ -18,9 +18,7 @@ def create_app(config_class=Config):
     app.config["COMPRESS_MIN_SIZE"] = 1024
 
     Compress(app)
-
     CORS(app)
-    # CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000", "http://127.0.0.1:3000"]}})
 
     app.register_blueprint(radar_bp, url_prefix='/api/v1')
     app.register_blueprint(reports_bp, url_prefix='/api/v1')
