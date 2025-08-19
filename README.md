@@ -30,8 +30,9 @@ pip install cftime
 pip install tables
 `````
 
+To start the backend run the following command from the root directory:
 `````
-yarn start-api
+python -m backend.main
 `````
 
 
@@ -151,10 +152,10 @@ You may also see any lint errors in the console.
 Start the back end with:
 
 
-mac/linux: `yarn start-api`
+mac/linux: `python -m backend.main`
 
 
-windows: `yarn start-api-windows`
+windows: `python -m backend.main`
 
 Runs the back end  in the development mode on [http://localhost:5000](http://localhost:5000).
 
