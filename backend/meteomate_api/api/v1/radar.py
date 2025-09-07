@@ -1,7 +1,7 @@
 import json, gzip
 from flask import Blueprint, request, Response
-from backend.core.db import pool
-from backend.core.config import Config
+from meteomate_api.core.db import pool
+from meteomate_api.core.config import Config
 from psycopg.rows import dict_row
 
 bp = Blueprint("radar", __name__)
@@ -52,8 +52,7 @@ def get_czc_radar():
     return resp
 
 @bp.get("/radar-bzc")
-def get_bzc_radar():
-        
+def get_bzc_radar():       
     starttime =  request.args.get('starttime', default=1633586400000)
     endtime = request.args.get('endtime', default=1654192800000)
 

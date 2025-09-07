@@ -1,7 +1,7 @@
 import json, gzip
 from flask import Blueprint, request, jsonify
-from backend.core.db import pool
-from backend.core.config import Config
+from meteomate_api.core.db import pool
+from meteomate_api.core.config import Config
 from psycopg.rows import dict_row
 from psycopg import sql
 
@@ -48,7 +48,7 @@ def get_reports():
     with pool.connection() as conn, conn.cursor(row_factory=dict_row) as cur:
         cur.execute(sql, params)
         rows = cur.fetchall()
-
+    
     return jsonify(rows)
 
 @bp.post("/getData")

@@ -1,0 +1,39 @@
+services:
+  meteomate_frontend:
+    env_file: .env
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.meteomate_frontend
+      args:
+        # List all environment variables that we need to have available at build time
+        # (the corresponding values are taken from '.env')
+        - API_UPSTREAM_HOST
+        - API_UPSTREAM_PORT
+        - API_PREFIX
+    container_name: meteomate_frontend
+    ports:
+      - "80:80"
+
+  meteomate_api:
+    env_file: .env
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.meteomate_api
+    container_name: meteomate_api
+    ports:
+      - "${API_UPSTREAM_PORT}:${API_UPSTREAM_PORT}"
+
+  meteomate_postgis:
+    env_file: .env
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.meteomate_postgis
+    container_name: meteomate_postgis
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./backend/meteomate_postgis/data:/tmp
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+volumes:
+  postgis_data:
