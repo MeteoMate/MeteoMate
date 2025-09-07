@@ -1,9 +1,9 @@
 import json, gzip
 from flask import Blueprint, request, jsonify
-from backend.core.db import pool
-from backend.core.config import Config
+from meteomate_api.core.db import pool
+from meteomate_api.core.config import Config
 import pandas as pd
-from ...services.get_trajectories import get_trajectories_between_dates
+from meteomate_api.services.get_trajectories import get_trajectories_between_dates
 
 bp = Blueprint("trajectories", __name__)
 
