@@ -13,9 +13,16 @@ server {
   {% elif APP_ENV == "production" %}
   
   # --- Production settings ---
-  listen 443 ssl http2;
-  listen [::]:443 ssl http2;
+  #listen 443 ssl http2;
+  #listen [::]:443 ssl http2;
+
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  http2 on;
   server_name {{ SERVER_NAME }};
+
+  ssl_certificate     /etc/nginx/certs/fullchain.pem;
+  ssl_certificate_key /etc/nginx/certs/privkey.pem;
   
   {% endif %}
 
