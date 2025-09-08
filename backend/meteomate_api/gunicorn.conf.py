@@ -25,7 +25,7 @@ def _bool_env(name: str, default: bool) -> bool:
     return raw.lower() in {"1", "true", "t", "yes", "y", "on"}
 
 # ---------- binding ----------
-# HOST:PORT of the backend API
+# HOST:PORT of the Flask API
 host = "0.0.0.0"
 port = os.getenv("API_UPSTREAM_PORT", "5000")
 try:

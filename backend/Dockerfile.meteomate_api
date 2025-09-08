@@ -1,7 +1,7 @@
 # ---------- Base image ----------
 FROM python:3.10-slim
 
-# Faster Python, cleaner layers
+# Faster Python, Docker cleaner layers
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
@@ -11,13 +11,13 @@ WORKDIR /app
 RUN useradd -m appuser
 
 # ---------- Install Python deps (leverage Docker layer cache) ----------
-# Copy only dependency files first so changes to source don’t bust the cache
+# Copy only dependency files first to leverage Docker layer cache
 COPY meteomate_api/requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip \
- && pip install --no-cache-dir -r /app/requirements.txt
+    && pip install --no-cache-dir -r /app/requirements.txt
 
 # ---------- Copy application code ----------
-# Put the package under /app so it's importable as `meteomate_api`
+# Put the package under /app so it is importable as `meteomate_api`
 COPY meteomate_api/ /app/meteomate_api/
 
 # Ensure runtime can read everything
