@@ -1,18 +1,23 @@
 # ---------- Stage 1: Build the SPA ----------
-# Uses Node to build your static site (JS/CSS/assets)
+# Uses Node to build static site (JS/CSS/assets)
 FROM node:lts AS build
 
 WORKDIR /app
 
 # Copy manifests first to leverage Docker layer caching
-COPY package.json yarn.lock ./
-# Install all deps (build needs devDependencies). --frozen-lockfile = reproducible
-RUN yarn install --frozen-lockfile
+COPY package.json ./
+# Install all deps 
+RUN yarn install
+
+# # Alternatively, use yarn.lock and "--frozen-lockfile" for reproducibility
+# COPY package.json yarn.lock ./
+# # Install all deps 
+# RUN yarn install --frozen-lockfile
 
 # Now copy the rest and build
 COPY . .
 RUN yarn build
-# Output is assumed at /app/build (adjust if your bundler differs)
+# Output is assumed at /app/build 
 
 # ---------- Stage 2: Render Nginx config from template ----------
 # Python stage to turn nginx.conf.j2 + build args into nginx.conf
@@ -24,6 +29,8 @@ WORKDIR /app
 ARG API_UPSTREAM_HOST
 ARG API_UPSTREAM_PORT
 ARG API_PREFIX
+ARG APP_ENV
+ARG SERVER_NAME
 
 # Template + renderer
 COPY nginx/nginx.conf.j2 /app/nginx.conf.j2
@@ -31,8 +38,8 @@ COPY nginx/generate_nginx_conf.py /app/generate_nginx_conf.py
 
 # Only need Jinja2 to render the template
 RUN pip install --no-cache-dir --upgrade pip jinja2 \
- && python generate_nginx_conf.py
-# Expects to write /app/nginx.conf (and any other artifacts you generate)
+    && python generate_nginx_conf.py
+# Expects to write /app/nginx.conf (and any additional artifacts we generate)
 
 # ---------- Stage 3: Runtime (Nginx serving static files) ----------
 FROM nginx:1.29-alpine AS runtime

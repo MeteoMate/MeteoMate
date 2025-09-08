@@ -5,14 +5,23 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.meteomate_frontend
       args:
-        # List all environment variables that we need to have available at build time
-        # (the corresponding values are taken from '.env')
+        # --- Build-time variables ---
+        # These values are injected during the image build stage.
+        # IMPORTANT:
+        #   1. They must be listed here.
+        #   2. They must also be declared as ARG in Dockerfile.meteomate_frontend.
+        #   3. The values are pulled from `.env` automatically.
+        - APP_ENV
         - API_UPSTREAM_HOST
         - API_UPSTREAM_PORT
         - API_PREFIX
+        - SERVER_NAME
     container_name: meteomate_frontend
     ports:
       - "80:80"
+    depends_on:
+      meteomate_api:
+        condition: service_healthy
 
   meteomate_api:
     env_file: .env
@@ -22,6 +31,19 @@ services:
     container_name: meteomate_api
     ports:
       - "${API_UPSTREAM_PORT}:${API_UPSTREAM_PORT}"
+    depends_on:
+      meteomate_postgis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python - <<'PY'\nimport os, socket, sys\nhost='127.0.0.1'\nport=int(os.getenv('API_UPSTREAM_PORT','5000'))\ns=socket.socket(); s.settimeout(2)\ntry:\n  s.connect((host, port))\n  s.close()\n  sys.exit(0)\nexcept Exception:\n  sys.exit(1)\nPY"
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
 
   meteomate_postgis:
     env_file: .env
@@ -34,6 +56,11 @@ services:
       - ./backend/meteomate_postgis/data:/tmp
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h localhost -p 5432"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
 
 volumes:
   postgis_data:
