@@ -6,7 +6,7 @@ def get_trajectories_between_dates(target_startdate_str, target_enddate_str):
     target_startdate = datetime.strptime(target_startdate_str, "%Y-%m-%d %H:%M:%S")
     target_enddate = datetime.strptime(target_enddate_str, "%Y-%m-%d %H:%M:%S")
 
-    with open('backend/data/trajectories.json', 'r') as json_file:
+    with open('meteomate_api/data/trajectories.json', 'r') as json_file:
         data = json.load(json_file)
         
     matched_data = {"type": "FeatureCollection", "features": []}

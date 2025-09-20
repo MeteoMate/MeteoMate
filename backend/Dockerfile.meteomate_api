@@ -1,29 +1,45 @@
-# ---------- Base image ----------
-FROM python:3.10-slim
+# ---------- Base image (shared) ----------
+FROM python:3.10-slim AS api-base
 
 # Faster Python, cleaner docker layers
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# ---------- Workdir & non-root user ----------
+# Workdir & non-root user
 WORKDIR /app
 RUN useradd -m appuser
 
-# ---------- Install Python deps (leverage Docker layer cache) ----------
-# Copy only dependency files first to leverage Docker layer cache
+# Install Python deps (leverage Docker layer cache)
+# Copy only dependency files first
 COPY meteomate_api/requirements.txt /app/requirements.txt
 RUN python -m pip install --upgrade pip \
     && pip install --no-cache-dir -r /app/requirements.txt
 
-# ---------- Copy application code ----------
-# Put the package under /app so it is importable as `meteomate_api`
+# Copy application code
 COPY meteomate_api/ /app/meteomate_api/
 
-# Ensure runtime can read everything
+# Permissions
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# ---------- Runtime ----------
-# Use the existing gunicorn config inside the package
+# Note: No CMD here -- runtime targets below define it
+
+
+# ---------- Development runtime ----------
+FROM api-base AS api-dev
+# Defaults; can be overridden at runtime
+ENV FLASK_ENV=development \
+    FLASK_DEBUG=1 \
+    API_UPSTREAM_PORT=5000
+
+# For development, use the Flask dev server with auto-reload
+# (use sh -c so $API_UPSTREAM_PORT expands at runtime)
+CMD ["sh", "-c", "flask --app=meteomate_api.main:app run --host=0.0.0.0 --port=$API_UPSTREAM_PORT --reload"]
+
+
+# ---------- Production runtime ----------
+FROM api-base AS api-prod
+ENV APP_ENV=production
+# For production, use the existing gunicorn config inside the package
 CMD ["gunicorn", "-c", "/app/meteomate_api/gunicorn.conf.py", "meteomate_api.main:app"]

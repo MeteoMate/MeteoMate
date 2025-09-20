@@ -1,25 +1,70 @@
+# -------- http-level maps --------
+map $http_origin $cors_origin {
+    default "";
+
+  {% if APP_ENV == "development" %}
+
+    # Local development
+    "~^http://{{ SERVER_NAME_DEV | re_lit }}(:[0-9]+)?$"  $http_origin;
+
+  {% elif APP_ENV == "production" %}
+
+    # Production origins
+    "~^https://{{ SERVER_NAME_PROD | re_lit }}$"          $http_origin;
+
+  {% endif %}
+}
+
+# Allow credentials only when we actually reflected an origin
+map $cors_origin $cors_allow_creds {
+    ""      "false";
+    default "true";
+}
+
+# For WebSockets/HTTP upgrade
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ""      close;
+}
+
+{% if APP_ENV == "development" %}
+
+# React dev server runs in a separate container:
+# - Named  : "REACT_APP_UPSTREAM_HOST_DEV" 
+# - On port: "REACT_APP_UPSTREAM_PORT_DEV"
+upstream react_dev {
+  server {{ REACT_APP_UPSTREAM_HOST_DEV }}:{{ REACT_APP_UPSTREAM_PORT_DEV }};
+  keepalive 30;
+}
+
+{% elif APP_ENV == "production" %}
+
+{% endif %}
+
+
+# Flask API runs in a separate container:
+# - Named  : "API_UPSTREAM_HOST" 
+# - On port: "API_UPSTREAM_PORT"
 upstream api_backend {
   server {{ API_UPSTREAM_HOST }}:{{ API_UPSTREAM_PORT }};
   keepalive 30;
 }
 
+# ------------------------- server block --------------------------
 server {
   {% if APP_ENV == "development" %}
-  
+
   # --- Local development settings ---
-  listen 80;
-  server_name _;
+  listen {{ NGINX_PORT_DEV }};
+  server_name {{ SERVER_NAME_DEV }};
 
   {% elif APP_ENV == "production" %}
-  
-  # --- Production settings ---
-  #listen 443 ssl http2;
-  #listen [::]:443 ssl http2;
 
-  listen 443 ssl;
-  listen [::]:443 ssl;
+  # --- Production settings ---
+  listen {{ NGINX_PORT_PROD }} ssl;
+  listen [::]:{{ NGINX_PORT_PROD }} ssl;
   http2 on;
-  server_name {{ SERVER_NAME }};
+  server_name {{ SERVER_NAME_PROD }};
 
   ssl_certificate     /etc/nginx/certs/fullchain.pem;
   ssl_certificate_key /etc/nginx/certs/privkey.pem;
@@ -34,24 +79,20 @@ server {
   gzip_comp_level 5;
   gzip_min_length 256;
   gzip_vary on;
+  gzip_proxied any;
   gzip_types
-      text/plain text/css text/javascript application/javascript application/json
+      text/plain text/css application/javascript application/json
       application/xml image/svg+xml application/wasm
       font/ttf font/otf application/vnd.ms-fontobject;
 
   # --- Security-related headers ---
-  #add_header X-Content-Type-Options nosniff always;
-  #add_header Referrer-Policy no-referrer-when-downgrade always;
-  #add_header X-Frame-Options SAMEORIGIN always;
-  #add_header X-XSS-Protection "1; mode=block" always;
+  add_header X-Content-Type-Options nosniff always;
+  add_header Referrer-Policy no-referrer-when-downgrade always;
+  add_header X-Frame-Options SAMEORIGIN always;
+  add_header X-XSS-Protection "1; mode=block" always;
 
+  # Disable emitting the nginx version in error messages and in the “Server” response header
   server_tokens off;
-
-  # --- Long-cache (immutable assets) ---
-  location ~* \.(?:js|mjs|css|wasm|svg|png|jpe?g|gif|webp|ico)$ {
-    add_header Cache-Control "public, max-age=31536000, immutable";
-    try_files $uri =404;
-  }
 
   # --- API proxy ---
   location ^~ {{ API_PREFIX }} {
@@ -65,9 +106,56 @@ server {
     proxy_set_header X-Forwarded-Host  $host;
     proxy_set_header X-Forwarded-Port  $server_port;
 
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
+    #proxy_set_header Upgrade $http_upgrade;
+    #proxy_set_header Connection "upgrade";
+    proxy_set_header Upgrade    $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
     proxy_read_timeout 300s;
+  
+    # --- CORS on API responses ---
+    add_header Access-Control-Allow-Origin $cors_origin always;
+    add_header Access-Control-Allow-Credentials $cors_allow_creds always;
+    add_header Vary "Origin" always;
+
+    # Handle preflight quickly
+    if ($request_method = OPTIONS) {
+        add_header Access-Control-Allow-Origin $cors_origin always;
+        add_header Access-Control-Allow-Credentials $cors_allow_creds always;
+        add_header Access-Control-Allow-Methods "GET,POST,PUT,PATCH,DELETE,OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization,Content-Type" always;
+        add_header Access-Control-Max-Age 86400 always;
+        add_header Vary "Origin" always;
+        return 204;
+    }
+  }
+
+  {% if APP_ENV == "development" %}
+
+  # In development, serve everything from the React development server.
+  # (Do not use root/try_files here; the dev server handles SPA fallback)
+  location / {
+    proxy_http_version 1.1;
+    proxy_pass http://react_dev;
+
+    # HMR / WebSockets
+    proxy_set_header Upgrade           $http_upgrade;
+    proxy_set_header Connection        $connection_upgrade;
+
+    # Forward client details
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # For development avoid caching
+    add_header Cache-Control "no-store" always;
+  }
+  {% elif APP_ENV == "production" %}  
+
+  # --- Long-cache (immutable assets) ---
+  location ~* \.(?:js|mjs|css|wasm|svg|png|jpe?g|gif|webp|ico)$ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri =404;
   }
 
   # --- SPA frontend fallback ---
@@ -75,4 +163,5 @@ server {
     # If file exists serve it, otherwise fallback to index.html
     try_files $uri $uri/ /index.html;
   }
+  {% endif %}
 }
