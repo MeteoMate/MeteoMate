@@ -5,7 +5,6 @@ import CititzenWeatherVA1 from './images/compressed_0_CitizenWeatherVA-1.jpg';
 import CititzenWeatherVA2 from './images/compressed_0_CitizenWeatherVA-1.jpg';
 
 export default function Dashboard() {
-
     return (
         <div className="dashboard-wrapper">
             <div className="header-bar">
