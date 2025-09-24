@@ -1,0 +1,90 @@
+services:
+  meteomate_frontend:
+    # Reverse-proxy + static file server for the frontend in production.
+    # Routes API calls to the backend and serves compiled assets as needed.
+    env_file: .env
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.meteomate_frontend
+      target: frontend-prod
+      args:
+        # --- Build-time variables ---
+        # These values are injected during the image build stage.
+        # NOTICE:
+        #   1. They must be listed here.
+        #   2. They must also be declared as ARG in Dockerfile.meteomate_frontend.
+        #   3. The values are pulled from file '.env' automatically.
+        - APP_ENV
+        - API_UPSTREAM_HOST
+        - API_UPSTREAM_PORT
+        - API_PREFIX
+        - SERVER_NAME_PROD
+        - NGINX_PORT_PROD
+        # The following 'REACT_APP_API_URL' environment variable is constructed to make the
+        # frontend always calls the NGINX reverse-proxy.
+        - REACT_APP_API_URL=http://${SERVER_NAME_PROD}:${NGINX_PORT_PROD}
+    container_name: meteomate_frontend
+    ports:
+      # Expose NGINX on the same port inside/outside the container.
+      # Example: 443:443 if NGINX_PORT_PROD=443 in the '.env' file.
+      - "${NGINX_PORT_PROD}:${NGINX_PORT_PROD}"
+    depends_on:
+      # Ensure the API is up (and healthy) before NGINX starts proxying to it.
+      meteomate_api:
+        condition: service_healthy
+
+  meteomate_api:
+    # Development-only container running the Flask dev server (enables hot reload).
+    # Useful for local iteration without rebuilding the Flask API image.
+    env_file: .env
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.meteomate_api
+      target: api-prod
+    container_name: meteomate_api
+    ports:
+      # Expose the backend upstream port (used by NGINX).
+      - "${API_UPSTREAM_PORT}:${API_UPSTREAM_PORT}"
+    depends_on:
+      # Make sure the Flask API only starts after the database is reachable.
+      meteomate_postgis:
+        condition: service_healthy
+    healthcheck:
+      # Container self-check: run the app's Python healthcheck script.
+      test: ["CMD", "python", "/app/meteomate_api/healthcheck.py"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+  meteomate_postgis:
+    # PostgreSQL + PostGIS database.
+    env_file: .env
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.meteomate_postgis
+    container_name: meteomate_postgis
+    volumes:
+      # Primary data directory (persisted across container restarts).
+      - postgis_data:/var/lib/postgresql/data
+      # Local directory made available inside the container for importing data.
+      - ./backend/meteomate_postgis/data:/tmp
+    ports:
+      # Expose Postgres on the configured port for clients, i.e., the Flask backend to use.
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      # Container self-check: use pg_isready to verify that the DB is accepting connections.
+      # NOTE: Using 127.0.0.1 checks the server inside the container network stack.
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} -h 127.0.0.1 -p ${POSTGRES_PORT}",
+        ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  # Named volume for database persistence.
+  postgis_data:

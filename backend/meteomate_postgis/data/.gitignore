@@ -1,0 +1,6 @@
+# Make sure only the compressed files are tracked in Git
+# Ignore de-compressed files
+czc_radar_dump.sql
+bzc_radar_dump.sql
+__MACOSX
+data.geojson

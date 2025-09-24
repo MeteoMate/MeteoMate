@@ -1,0 +1,23 @@
+.legend {
+    position: absolute;
+    background: white;
+    padding: 10px;
+    z-index: 1000;
+    border: 1px solid black;
+
+    div {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    span {
+        font-size: 12px;
+        padding-top: 5px;
+    }
+
+    img {
+        width: 50px;
+        margin-right: 10px;
+    }
+
+}
