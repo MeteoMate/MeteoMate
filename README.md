@@ -27,6 +27,8 @@ git clone git@github.com:MeteoMate/MeteoMate.git && cd MeteoMate
 ### 2) Prepare data archives
 
 ```bash
+### Drop the post-processed data in the 'meteomate_postgis/data' folder, for example: 
+### <<<DO NOT CHANGE>>> THE NAME OF THE FOLDER OR THE PLACE TO STORAGE THE DATA
 unzip -o backend/meteomate_postgis/data/radar_dump.zip -d backend/meteomate_postgis/data/ && \
 unzip -o backend/meteomate_postgis/data/data.geojson.zip -d backend/meteomate_postgis/data/
 ```
@@ -41,6 +43,10 @@ docker compose -f docker-compose-dev.yaml up -d
 
 ```bash
 # Summarize container state
+# With this command you can check at any moment is the Docker Compose is running
+# CHECK THAT BOTH STATUS are (healthy)             
+# meteomate_api                 (healthy)  
+# meteomate_postgis             (healthy)   
 docker compose -f docker-compose-dev.yaml ps
 
 # (Optional) follow logs

@@ -1,5 +1,5 @@
 # ---------- Base image ----------
-FROM postgis/postgis:latest
+FROM postgis/postgis:16-3.4
 
 # ---------- Install PostGIS utilities ----------
 RUN apt-get update \

@@ -95,6 +95,8 @@ services:
       start_period: 5s
 
   meteomate_postgis:
+    ## CHANGE IN CASE OF ARM64 architecture: Force the use of the amd64 platform for compatibility on M1/M2 Macs.
+    platform: linux/arm64
     # PostgreSQL + PostGIS database.
     env_file: .env
     build:
@@ -105,7 +107,7 @@ services:
       # Primary data directory (persisted across container restarts).
       - postgis_data:/var/lib/postgresql/data
       # Local directory made available inside the container for importing data.
-      - ./backend/meteomate_postgis/data:/tmp
+      - ${POSTGRES_DB_LOCAL_DIR:-./backend/meteomate_postgis/data}:/tmp
     ports:
       # Expose Postgres on the configured port for clients, i.e., the Flask backend to use.
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
