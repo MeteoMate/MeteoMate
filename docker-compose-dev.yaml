@@ -60,6 +60,8 @@ services:
     volumes:
       # Mount source for instant code changes without rebuilding the image.
       - ./frontend:/app
+      # Anonymous volume keeps deps from the image
+      - /app/node_modules
     ports:
       # Expose the React dev server on the same port inside/outside the container.
       - "${REACT_APP_UPSTREAM_PORT_DEV}:${REACT_APP_UPSTREAM_PORT_DEV}"
