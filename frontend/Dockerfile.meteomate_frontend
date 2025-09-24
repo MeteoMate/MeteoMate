@@ -1,0 +1,118 @@
+# ---------- (production) Stage 1: Build the SPA ----------
+# Uses Node to build static site (JS/CSS/assets)
+FROM node:lts AS build
+
+WORKDIR /app
+
+# Copy manifests first to leverage Docker layer caching
+COPY package.json ./
+# Install all deps 
+RUN yarn install
+
+# Build args passed at build time (used by React Create App, i.e., CRA)
+ARG REACT_APP_API_URL
+
+# Now copy the rest of the files and build
+COPY . .
+RUN yarn build
+# Output is assumed at /app/build 
+
+
+# ---------- (production) Stage 2: Render Nginx config from template ----------
+# Python stage to turn nginx.conf.j2 + build args into nginx.conf
+FROM python:3.10-slim AS nginx-config
+
+WORKDIR /app
+
+# Build args passed at build time (used by Python)
+ARG APP_ENV
+ARG API_UPSTREAM_HOST
+ARG API_UPSTREAM_PORT
+ARG API_PREFIX
+ARG SERVER_NAME_DEV
+ARG SERVER_NAME_PROD
+ARG NGINX_PORT_DEV
+ARG NGINX_PORT_PROD
+ARG REACT_APP_UPSTREAM_HOST_DEV
+ARG REACT_APP_UPSTREAM_PORT_DEV
+
+# Template + renderer
+COPY nginx/nginx.conf.j2 /app/nginx.conf.j2
+COPY nginx/generate_nginx_conf.py /app/generate_nginx_conf.py
+
+# We only need Jinja2 to render the template
+RUN pip install --no-cache-dir --upgrade pip jinja2 \
+    && python generate_nginx_conf.py
+# Expects to write /app/nginx.conf
+
+
+# ---------- (production) Stage 3: Generate self-signed TLS certs ----------
+FROM alpine:3.20 AS certs
+
+ARG SERVER_NAME=localhost
+RUN apk add --no-cache openssl
+RUN mkdir -p /out \
+    && openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
+    -keyout /out/privkey.pem \
+    -out /out/fullchain.pem \
+    -subj "/CN=${SERVER_NAME}"
+
+
+# ---------- (production) Stage 4: Setup runtime (NGINX serving static files) ----------
+FROM nginx:1.29-alpine AS frontend-prod
+
+# Static site lives here in the base image
+WORKDIR /usr/share/nginx/html
+
+# Bring in built assets from Stage 1
+COPY --from=build /app/build ./
+
+# Replace default server config with the rendered one
+COPY --from=nginx-config /app/nginx.conf /etc/nginx/conf.d/default.conf
+
+# TLS certs
+COPY --from=certs  /out/privkey.pem /etc/nginx/certs/privkey.pem
+COPY --from=certs  /out/fullchain.pem /etc/nginx/certs/fullchain.pem
+
+# An ENTRYPOINT/CMD command is provided by the base NGINX image
+
+
+# ---------- (Development) Stage 1: Dev server ----------
+FROM nginx:1.29-alpine AS frontend-dev-nginx
+
+# Replace default server config with the rendered one
+COPY --from=nginx-config /app/nginx.conf /etc/nginx/conf.d/default.conf
+
+# TLS certs
+COPY --from=certs  /out/privkey.pem /etc/nginx/certs/privkey.pem
+COPY --from=certs  /out/fullchain.pem /etc/nginx/certs/fullchain.pem
+
+# An ENTRYPOINT/CMD command is provided by the base NGINX image
+
+
+# ---------- (Development) Stage 1: Dev server ----------
+FROM node:lts AS frontend-dev-react
+
+WORKDIR /app
+# Copy manifests first to leverage Docker layer caching
+COPY package.json ./
+
+# Install all deps 
+RUN yarn install
+
+COPY . .
+
+# Build args passed at build time (used by React)
+# ARG APP_ENV (keep for now, as it could be useful to utilize in the future!)
+# ARG API_PREFIX (keep for now, as it could be useful to utilize in the future!)
+ARG REACT_APP_API_URL
+ARG REACT_APP_UPSTREAM_PORT_DEV
+# Promote build time arguments to environment variable that can be used at runtime 
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV PORT=$REACT_APP_UPSTREAM_PORT_DEV
+# Define other environment variables necessary
+ENV HOST=0.0.0.0
+ENV CHOKIDAR_USEPOLLING=true
+
+# Run the react development server 
+CMD ["yarn", "start"]

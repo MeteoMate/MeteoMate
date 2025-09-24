@@ -1,0 +1,10 @@
+# ---------- Base image ----------
+FROM postgis/postgis:16-3.4
+
+# ---------- Install PostGIS utilities ----------
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./meteomate_postgis/data/* /tmp/

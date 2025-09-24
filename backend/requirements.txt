@@ -1,7 +1,0 @@
-Flask
-flask-cors
-Flask-Compress
-python-dotenv
-psycopg[binary,pool]
-pandas
-python-dotenv
