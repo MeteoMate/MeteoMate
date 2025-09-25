@@ -75,16 +75,10 @@ const CategorySelector = () => {
     const events = [
         {
             value: "event-1",
-            label: "Event 1",
+            label: "Filter by time",
             startTime: new Date('2022-05-04 11:00').getTime(),
             endTime: new Date('2022-05-04 21:00').getTime(),
-        },
-        {
-            value: "event-2",
-            label: "Event 2",
-            startTime: new Date('2022-05-06 11:00').getTime(),
-            endTime: new Date('2022-05-06 21:00').getTime(),
-        },
+        }
     ]
 
 
