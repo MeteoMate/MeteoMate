@@ -23,8 +23,8 @@ def _required_env(name: str) -> str:
 
 class Config:
     REPORTS_TABLE_NAME: str = os.getenv("REPORTS_TABLE_NAME", "reports")
-    CZC_RADAR_TABLE_NAME: str = os.getenv("CZC_RADAR_TABLE_NAME", "radar")
-    BZC_RADAR_TABLE_NAME: str = os.getenv("BZC_RADAR_TABLE_NAME", "radar2")
+    CZC_RADAR_TABLE_NAME: str = os.getenv("CZC_RADAR_TABLE_NAME", "czc_radar")
+    BZC_RADAR_TABLE_NAME: str = os.getenv("BZC_RADAR_TABLE_NAME", "bzc_radar")
 
     @cached_property
     def DATABASE_URL(self) -> str:

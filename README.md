@@ -27,8 +27,8 @@ git clone git@github.com:MeteoMate/MeteoMate.git && cd MeteoMate
 ### 2) Prepare data archives
 
 ```bash
-### Drop the post-processed data in the 'meteomate_postgis/data' folder, for example: 
-### <<<DO NOT CHANGE>>> THE NAME OF THE FOLDER OR THE PLACE TO STORAGE THE DATA
+# Drop the post-processed data in the 'meteomate_postgis/data' folder, for example: 
+# <<<DO NOT CHANGE>>> THE NAME OF THE FOLDER OR THE PLACE TO STORAGE THE DATA
 unzip -o backend/meteomate_postgis/data/radar_dump.zip -d backend/meteomate_postgis/data/ && \
 unzip -o backend/meteomate_postgis/data/data.geojson.zip -d backend/meteomate_postgis/data/
 ```
@@ -67,6 +67,8 @@ set +a
 
 **Load GeoJSON and radar SQL dumps:**
 
+The following data dumping illustrates how to CREATE the data TABLE "reports" from the "data.geojson" and LOAD the data values
+
 ```bash
 # Import GeoJSON into the DB (requires GDAL/ogr2ogr in the PostGIS image)
 docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
@@ -74,6 +76,7 @@ docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
   PG:"dbname=$POSTGRES_DB user=$POSTGRES_USER password=$POSTGRES_PASSWORD host=127.0.0.1 port=$POSTGRES_PORT" \
   /tmp/data.geojson -nln reports -nlt PROMOTE_TO_MULTI && \
 
+# The following data dumping illustrates how to CREATE the data TABLE "czc_radar" and "bzc_radar" from the sql radar data dumps and LOAD the radar data values
 # Import radar dumps via psql
 docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
   psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p "$POSTGRES_PORT" -f /tmp/bzc_radar_dump.sql && \
