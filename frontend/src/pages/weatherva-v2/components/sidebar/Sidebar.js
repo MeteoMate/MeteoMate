@@ -59,7 +59,7 @@ const Sidebar = () => {
                     <div id="filter">
                         <h2>Filter options</h2>
                         <MemoizedTimePicker />
-                        <MemoizedEventSelector />
+                        {/* <MemoizedEventSelector /> */}
 
                         <h2 onClick={toggleReports} id="sidebar-clickable-title"> {showReports ? "▼" : "▶"} Reports </h2>
                         {showReports && (

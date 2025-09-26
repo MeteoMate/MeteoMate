@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  timeRange: [new Date("2021-10-07T06:00Z").getTime(), new Date("2022-06-02T18:00Z").getTime()],
+  timeRange: [new Date("2022-05-04T11:00Z").getTime(), new Date("2022-05-04T21:00Z").getTime()],
   categories: [],
   intensities: [],
   pictures: 0,
