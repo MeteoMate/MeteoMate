@@ -1,8 +1,0 @@
-00_RawData/*
-01_CreateRasterRadar/CZC/*
-**/node_modules/**
-**/*.h5
-_archive.zip
-archive_TobacNotebook.zip
-
-!05_Trajectories/Track.h5
