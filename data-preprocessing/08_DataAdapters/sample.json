@@ -1,0 +1,27 @@
+[
+    {
+        "CONTACT": "\"Landmarks of World History\". Chris Chatfield; submitted by Thilo Kühne (ESSL)",
+        "COUNTRY": "GB",
+        "DELETED": false,
+        "EMAIL": "eswd@essl.org",
+        "EVENT_DESCRIPTION": "storm and sea flood; Romanian soldiers drowned;",
+        "HIDDEN": false,
+        "INFO_SOURCE": ["WWW", "LIT"],
+        "LATITUDE": 51.4,
+        "LINK_ID": "8484",
+        "LINK_ORG": "ESSL",
+        "LONGITUDE": 1.4,
+        "NO_REVISION": 2,
+        "PERSON_REVISION": "ESSL",
+        "PLACE": "North Sea coast",
+        "PLACE_ACCURACY": "GT100KM",
+        "QC_LEVEL": "QC1",
+        "TIME_ACCURACY": "GT1D",
+        "TIME_CREATION": "2025-05-20T23:48:44.731Z",
+        "TIME_EVENT": "2025-07-01T00:00:00.000Z",
+        "TIME_LAST_REVISION": "2025-05-20T23:48:44.731Z",
+        "TYPE_EVENT": "WIND",
+        "REFERENCE": ["https://example.com"],
+        "id": "weather_events:[ d\"2025-07-01T00:00:00.000Z\", s\"01JVR1JZHVS8YENS61FQJ4VPG8\" ]"
+    }
+]
