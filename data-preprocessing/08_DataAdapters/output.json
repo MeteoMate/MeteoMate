@@ -1,0 +1,43 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "meldungId": 8484,
+                "crowdDeviceId": null,
+                "place": "GB, North Sea coast",
+                "timestamp": 1751328000000,
+                "submissionTimestamp": 1747784924731,
+                "category": "Wind",
+                "auspraegung": 3,
+                "zusatzAttribute": [],
+                "comment": "storm and sea flood; Romanian soldiers drowned;",
+                "imageOriginalUrl": null,
+                "imageUrl": null,
+                "imageThumbnailUrl": null,
+                "numberOfSubmissions": 2,
+                "approvalRate": 0.0,
+                "qualityCheckPassed": true,
+                "missingValidationData": false,
+                "qualityCheckMsg": null,
+                "timesReportedForImage": 0,
+                "timesReportedForWeather": 0,
+                "userType": null,
+                "sourceVersion": null,
+                "source": "ESSL",
+                "imageLabels": {
+                    "labels": [],
+                    "nsfwLabels": []
+                }
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    1.4,
+                    51.4
+                ]
+            }
+        }
+    ]
+}

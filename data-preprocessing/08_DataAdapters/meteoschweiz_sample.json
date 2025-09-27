@@ -1,0 +1,52 @@
+{
+    "type": "Feature",
+    "properties": {
+        "meldungId": 196314,
+        "crowdDeviceId": "f047ad4b-16c4-4bfe-9864-6c70ac1b0992",
+        "place": "Waldkirch",
+        "timestamp": 1623354665000,
+        "submissionTimestamp": 1654011346865,
+        "category": "HAGEL",
+        "auspraegung": "HAGEL_UNTER_1CM",
+        "zusatzAttribute": [],
+        "comment": null,
+        "imageOriginalUrl": "https://met-crowd-prod.s3.eu-central-1.amazonaws.com/images/8d7be5bc-079a-454c-909d-09dbaf03d41a.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20220602T163134Z&X-Amz-SignedHeaders=host&X-Amz-Expires=3600&X-Amz-Credential=AKIA4M472OWV3CDU5XN5%2F20220602%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=3682a8e7fab8d6da14c784c6c94f45ab525a1eda56968319da32bd1db6f4e0a3",
+        "imageUrl": "https://s3-eu-central-1.amazonaws.com/met-crowd-prod/images/processed/8d7be5bc-079a-454c-909d-09dbaf03d41a.jpg",
+        "imageThumbnailUrl": "https://s3-eu-central-1.amazonaws.com/met-crowd-prod/images/processed/8d7be5bc-079a-454c-909d-09dbaf03d41a_thumb.jpg",
+        "numberOfSubmissions": 1,
+        "approvalRate": 0.0,
+        "qualityCheckPassed": false,
+        "missingValidationData": false,
+        "qualityCheckMsg": "meldung timestamp is outside the supported range [2022-05-30T15:36:03.190Z, 2022-05-31T16:36:03.190Z]. now=2022-05-31T15:36:03.190Z meldungTimestamp=2021-06-10T19:51:05.000Z",
+        "timesReportedForImage": 0,
+        "timesReportedForWeather": 0,
+        "userType": "NORMAL",
+        "sourceVersion": "android-2.15",
+        "source": "MeteoSwissApp",
+        "imageLabels": {
+            "labels": [
+                { "name": "Nature", "confidence": 99.73408 },
+                { "name": "Outdoors", "confidence": 99.44787 },
+                { "name": "Sunset", "confidence": 98.44576 },
+                { "name": "Dusk", "confidence": 98.44576 },
+                { "name": "Red Sky", "confidence": 98.44576 },
+                { "name": "Dawn", "confidence": 98.44576 },
+                { "name": "Sky", "confidence": 98.44576 },
+                { "name": "Tree", "confidence": 92.421745 },
+                { "name": "Plant", "confidence": 92.421745 },
+                { "name": "Fir", "confidence": 87.77225 },
+                { "name": "Abies", "confidence": 87.77225 },
+                { "name": "Sunrise", "confidence": 85.09656 },
+                { "name": "Sunlight", "confidence": 83.409386 },
+                { "name": "Countryside", "confidence": 66.233215 },
+                { "name": "Building", "confidence": 57.613575 },
+                { "name": "Flare", "confidence": 54.219284 },
+                { "name": "Light", "confidence": 54.219284 },
+                { "name": "Scenery", "confidence": 53.85216 },
+                { "name": "Landscape", "confidence": 51.108753 }
+            ],
+            "nsfwLabels": []
+        }
+    },
+    "geometry": { "type": "Point", "coordinates": [9.295, 47.47] }
+}

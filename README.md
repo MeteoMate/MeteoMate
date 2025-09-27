@@ -64,7 +64,7 @@ set -a
 source .env
 set +a
 ```
-
+ 
 **Load GeoJSON and radar SQL dumps:**
 
 The following data dumping illustrates how to CREATE the data TABLE "reports" from the "data.geojson" and LOAD the data values
@@ -79,9 +79,9 @@ docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
 # The following data dumping illustrates how to CREATE the data TABLE "czc_radar" and "bzc_radar" from the sql radar data dumps and LOAD the radar data values
 # Import radar dumps via psql
 docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
-  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p "$POSTGRES_PORT" -f /tmp/bzc_radar_dump.sql && \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p "$POSTGRES_PORT" -f /tmp/radar_dump/bzc_radar_dump.sql && \
 docker compose -f docker-compose-dev.yaml exec "$POSTGRES_HOST" \
-  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p "$POSTGRES_PORT" -f /tmp/czc_radar_dump.sql
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -h 127.0.0.1 -p "$POSTGRES_PORT" -f /tmp/radar_dump/czc_radar_dump.sql
 ```
 
 ### 6) Open the app

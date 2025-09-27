@@ -1,6 +1,0 @@
-xarray
-pandas
-numpy
-matplotlib
-pyproj
-geojson
