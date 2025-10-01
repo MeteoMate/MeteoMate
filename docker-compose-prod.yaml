@@ -21,7 +21,7 @@ services:
         - NGINX_PORT_PROD
         # The following 'REACT_APP_API_URL' environment variable is constructed to make the
         # frontend always calls the NGINX reverse-proxy.
-        - REACT_APP_API_URL=http://${SERVER_NAME_PROD}:${NGINX_PORT_PROD}
+        - REACT_APP_API_URL=https://${SERVER_NAME_PROD}:${NGINX_PORT_PROD}
         # Specify that the container should use the 'production' runtime conditions:
         - APP_ENV=production
     container_name: meteomate_frontend
