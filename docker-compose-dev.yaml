@@ -14,7 +14,6 @@ services:
         #   1. They must be listed here.
         #   2. They must also be declared as ARG in Dockerfile.meteomate_frontend.
         #   3. The values are pulled from file '.env' automatically.
-        - APP_ENV
         - API_UPSTREAM_HOST
         - API_UPSTREAM_PORT
         - API_PREFIX
@@ -25,6 +24,8 @@ services:
         # The following 'REACT_APP_API_URL' environment variable is constructed to make the
         # frontend always calls the NGINX reverse-proxy.
         - REACT_APP_API_URL=http://${SERVER_NAME_DEV}:${NGINX_PORT_DEV}
+        # Specify that the container should use the 'development' runtime conditions:
+        - APP_ENV=development
     container_name: meteomate_frontend_dev_nginx
     ports:
       # Expose NGINX on the same port inside/outside the container.

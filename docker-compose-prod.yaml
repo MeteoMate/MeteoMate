@@ -14,7 +14,6 @@ services:
         #   1. They must be listed here.
         #   2. They must also be declared as ARG in Dockerfile.meteomate_frontend.
         #   3. The values are pulled from file '.env' automatically.
-        - APP_ENV
         - API_UPSTREAM_HOST
         - API_UPSTREAM_PORT
         - API_PREFIX
@@ -23,6 +22,8 @@ services:
         # The following 'REACT_APP_API_URL' environment variable is constructed to make the
         # frontend always calls the NGINX reverse-proxy.
         - REACT_APP_API_URL=http://${SERVER_NAME_PROD}:${NGINX_PORT_PROD}
+        # Specify that the container should use the 'production' runtime conditions:
+        - APP_ENV=production
     container_name: meteomate_frontend
     ports:
       # Expose NGINX on the same port inside/outside the container.
@@ -41,6 +42,9 @@ services:
       context: ./backend
       dockerfile: Dockerfile.meteomate_api
       target: api-prod
+      args:
+        # Specify that the container should use the 'production' runtime conditions:
+        - APP_ENV=production
     container_name: meteomate_api
     ports:
       # Expose the backend upstream port (used by NGINX).
@@ -68,7 +72,7 @@ services:
       # Primary data directory (persisted across container restarts).
       - postgis_data:/var/lib/postgresql/data
       # Local directory made available inside the container for importing data.
-      - ./backend/meteomate_postgis/data:/tmp
+      - ${POSTGRES_DB_LOCAL_DIR:-./backend/meteomate_postgis/data}:/tmp
     ports:
       # Expose Postgres on the configured port for clients, i.e., the Flask backend to use.
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
