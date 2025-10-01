@@ -39,6 +39,7 @@ export default function Dashboard() {
                 <p>
                     As part of Phase 3, we refactored all the architectural layers in order to simplify the deployment of our solution. 
                     The GitHub code is publicly available at <a href="https://github.com/MeteoMate" target="_blank" rel="noopener noreferrer">https://github.com/MeteoMate</a>. 
+                    
                     We also added a new data adapter to accommodate other types of citizen weather reports and made available a series of data processing modules to compute trajectories and transform radar data into 2D map layers. 
                     Ongoing efforts include current research on analyzing the impacts and damage on the ground, based on information provided by citizen reports and additional authoritative data sources. We foresee the need to develop new information layers, such as land use maps and demographic information, and to apply AI-based algorithms to extract relevant information from the images. 
                 </p>
